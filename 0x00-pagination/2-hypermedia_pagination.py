@@ -2,9 +2,12 @@
 """
 Script for hypermedia pagination
 """
+
+
 import csv
 import math
 from typing import Tuple, List, Dict, Any
+
 
 def index_range(page: int, page_size: int) -> Tuple[int, int]:
     """
@@ -16,6 +19,7 @@ def index_range(page: int, page_size: int) -> Tuple[int, int]:
     start_index = (page - 1) * page_size
     end_index = start_index + page_size
     return start_index, end_index
+
 
 class Server:
     """Server class for pagination of a dataset."""
@@ -56,7 +60,7 @@ class Server:
         Retrieve paginated data along with pagination information.
         :param page: The page number.
         :param page_size: The number of items per page.
-        :return: A dictionary containing the paginated data and pagination information.
+        :return: dict with the paginated data and pagination information.
         """
         total_pages = math.ceil(len(self.dataset()) / page_size)
         return {
