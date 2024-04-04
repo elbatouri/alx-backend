@@ -3,6 +3,7 @@
 """
 from base_caching import BaseCaching
 
+
 class BasicCache(BaseCaching):
     """
     A simple caching system that does not have a limit.
@@ -28,7 +29,7 @@ class BasicCache(BaseCaching):
         If key is None or if the key doesn't exist in cache_data, returns None.
 
         :param key: The key to retrieve the value for.
-        :return: The value associated with the key, or None if the key is not found.
+        :return: The value associated with the key, or None if not found.
         """
         if key is None or key not in self.cache_data:
             return None
