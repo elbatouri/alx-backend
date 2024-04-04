@@ -1,10 +1,9 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Least Frequently Used caching module.
 """
-from collections import defaultdict
+from collections import OrderedDict
 
 from base_caching import BaseCaching
-
 
 class LFUCache(BaseCaching):
     """Represents an object that allows storing and
@@ -15,32 +14,28 @@ class LFUCache(BaseCaching):
         """Initializes the cache.
         """
         super().__init__()
-        self.cache_data = {}
-        self.frequency = defaultdict(int)
+        self.cache_data = OrderedDict()
+        self.keys_freq = defaultdict(int)
+
+    def get(self, key):
+        """Retrieves an item by key.
+        """
+        if key is not None and key in self.cache_data:
+            self.keys_freq[key] += 1
+        return self.cache_data.get(key, None)
 
     def put(self, key, item):
         """Adds an item in the cache.
         """
         if key is None or item is None:
             return
-        if key in self.cache_data:
-            self.frequency[key] += 1
-        else:
+        if key not in self.cache_data:
             if len(self.cache_data) >= BaseCaching.MAX_ITEMS:
-                lru_key, _ = min(self.frequency.items(),
-                                 key=lambda x: x[1],
-                                 default=(None, BaseCaching.MAX_ITEMS + 1))
-                if lru_key is None:
-                    break
-                self.cache_data.pop(lru_key)
-                self.frequency.pop(lru_key)
-                print("DISCARD:", lru_key)
-            self.frequency[key] = 1
-        self.cache_data[key] = item
-
-    def get(self, key):
-        """Retrieves an item by key.
-        """
-        if key is not None and key in self.cache_data:
-            self.frequency[key] += 1
-        return self.cache_data.get(key, None)
+                lfu_key, _ = min(self.keys_freq.items(), key=lambda x: x[1])
+                self.cache_data.pop(lfu_key)
+                self.keys_freq.pop(lfu_key)
+                print("DISCARD:", lfu_key)
+            self.cache_data[key] = item
+            self.keys_freq[key] = 1
+        else:
+            self.keys_freq[key] += 1
