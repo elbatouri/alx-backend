@@ -1,48 +1,37 @@
 #!/usr/bin/env python3
+"""Force locale with URL parameter"""
 
-"""
-This module implements a Flask application that provides greetings in different languages based on the specified locale.
-"""
-
-from flask import Flask, request
-from typing import Optional
+from flask import Flask, render_template, request
+from flask_babel import Babel
 
 app = Flask(__name__)
-
-# Supported locales
-SUPPORTED_LOCALES = ['en', 'fr']
-
-# Default locale
-DEFAULT_LOCALE = 'en'
+babel = Babel(app)
 
 
-def get_locale() -> str:
-    """
-    Get the locale from the request parameters.
+class Config:
+    """Config class for Flask app"""
+    LANGUAGES = ["en", "fr"]
+    BABEL_DEFAULT_LOCALE = "en"
+    BABEL_DEFAULT_TIMEZONE = "UTC"
 
-    Returns:
-        str: The locale obtained from the request parameters.
-    """
+
+app.config.from_object(Config)
+
+
+@babel.localeselector
+def get_locale():
+    """Get locale from request"""
     locale = request.args.get('locale')
-    if locale and locale in SUPPORTED_LOCALES:
+    if locale in app.config['LANGUAGES']:
         return locale
-    return DEFAULT_LOCALE
+    return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
 @app.route('/')
-def hello_world() -> str:
-    """
-    Return a greeting message based on the locale.
-
-    Returns:
-        str: The greeting message in the appropriate language.
-    """
-    locale = get_locale()
-    if locale == 'fr':
-        return 'Bonjour, monde!'
-    else:
-        return 'Hello, world!'
+def index():
+    """Route for homepage"""
+    return render_template('4-index.html')
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run()
